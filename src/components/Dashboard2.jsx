@@ -23,100 +23,98 @@ const Dashboard2 = (props) => {
   ]);
   const [categoryData, setCategoryData] = useState(null);
   const [categoryData2, setCategoryData2] = useState(null);
-  // const [data1, setData1] = useState(null);
-  // const [data2, setData2] = useState(null);
-  const data1 = useRef(null);
-  const data2 = useRef(null);
+  const data1 = useRef([]);
+  const data2 = useRef([]);
 
   const [changeDate, setChangeDate] = useState(0);
   const [changeDate2, setChangeDate2] = useState(0);
+
   useEffect(() => {
-    // console.log("Dashboard2 mounted");
-
     const fetchData = async () => {
-      let i = 0;
-      const fetchedData = await fetch("https://dummyjson.com/products");
-      const results = await fetchedData.json();
+      try {
+        let i = 0;
+        const fetchedData = await fetch("https://dummyjson.com/products");
+        const results = await fetchedData.json();
 
-      const columnData = ["title", "category", "price", "rating", "stock"];
+        const columnData = ["title", "category", "price", "rating", "stock"];
 
-      const newData = results["products"].map((item) => {
-        // console.log(item);
-        let newItems = {};
-        for (let keys in item) {
-          if (columnData.includes(keys)) {
-            // console.log(keys);
-            newItems[keys] = item[keys];
-            newItems["sold"] = soldData.current[i];
-            newItems["sold2"] = soldData2.current[i];
-            i++;
+        const newData = results["products"].map((item) => {
+          let newItems = {};
+          for (let keys in item) {
+            if (columnData.includes(keys)) {
+              newItems[keys] = item[keys];
+              newItems["sold"] = soldData.current[i];
+              newItems["sold2"] = soldData2.current[i];
+              i++;
+            }
           }
-        }
+          return newItems;
+        });
 
-        return newItems;
-      });
-      setRowData(newData);
-      setData(newData);
-      data1.current = JSON.parse(JSON.stringify(newData));
-      data2.current = JSON.parse(JSON.stringify(newData));
-      // console.log("I am getting called");
+        setRowData(newData);
+        setData(newData);
+        data1.current = [...newData];
+        data2.current = [...newData];
+      } catch (error) {
+        console.error("Failed to fetch data", error);
+      }
     };
 
     fetchData();
-  }, []);
+  }, [soldData, soldData2]);
 
   useEffect(() => {
-    console.log("Date 1");
-    if (data1.current) {
+    if (data1.current.length > 0) {
       soldData.current = randomSold();
-      let i = 0;
-      const newData1 = data1.current.map((item) => {
-        item["sold"] = soldData.current[i];
-        i++;
-        return item;
-      });
-      // console.log(newData);
+      const newData1 = data1.current.map((item, i) => ({
+        ...item,
+        sold: soldData.current[i],
+      }));
       setCategoryData(groupedData(newData1, "category"));
       setRowData(newData1);
-      data1.current = JSON.parse(JSON.stringify(newData1));
-      // console.log(soldData);
+      data1.current = [...newData1];
     }
   }, [changeDate]);
 
   useEffect(() => {
-    console.log("Date 2");
-    if (data2.current) {
+    if (data2.current.length > 0) {
       soldData2.current = randomSold();
-      // console.log(data2);
-      let i = 0;
-      const newData2 = data2.current.map((item) => {
-        item["sold2"] = soldData2.current[i];
-        i++;
-        return item;
-      });
-      // console.log(newData);
+      const newData2 = data2.current.map((item, i) => ({
+        ...item,
+        sold2: soldData2.current[i],
+      }));
       setCategoryData2(groupedData(newData2, "category"));
       setRowData(newData2);
-      data2.current = JSON.parse(JSON.stringify(newData2));
-      // console.log(soldData2);
+      data2.current = [...newData2];
     }
   }, [changeDate2]);
-  const handleOnClick = () => {
-    // console.log("Clicked");
+
+  const handleDateChange1 = () => {
     setChangeDate((prev) => prev + 1);
   };
 
-  const handleOnClick2 = () => {
-    // console.log("Clicked");
+  const handleDateChange2 = () => {
     setChangeDate2((prev) => prev + 1);
   };
 
   return (
-    <>
-      <div>Dashboard 2</div>
-      <button onClick={handleOnClick}>Change Date1</button>
-      <button onClick={handleOnClick2}>Change Date2</button>
-      <div>Results for Dashboard 2</div>
+    <div className="bg-white shadow-md rounded p-4 mb-4">
+      <h2 className="text-xl font-semibold mb-4">Dashboard 2</h2>
+
+      <div className="flex space-x-4 mb-4">
+        <input
+          type="date"
+          onChange={handleDateChange1}
+          className="border p-2 rounded"
+        />
+        <input
+          type="date"
+          onChange={handleDateChange2}
+          className="border p-2 rounded"
+        />
+      </div>
+
+      <div className="mb-4">Results for Dashboard 2</div>
 
       {categoryData && categoryData2 && (
         <ChartComponent2 soldData={categoryData} soldData2={categoryData2} />
@@ -129,7 +127,7 @@ const Dashboard2 = (props) => {
       <div className="ag-theme-quartz" style={{ height: 500 }}>
         <AgGridReact rowData={rowData} columnDefs={colData} />
       </div>
-    </>
+    </div>
   );
 };
 

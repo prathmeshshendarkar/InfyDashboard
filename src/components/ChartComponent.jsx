@@ -17,24 +17,24 @@ const ChartComponent = (props) => {
   const { data } = props;
   const [dataset, setDataset] = useState(null);
 
-  // console.log(data);
   useEffect(() => {
     const populateData = () => {
       const dataSet = {
         labels: data.map((item) => item["category"]),
         datasets: [
           {
-            label: "Category Mapping",
+            label: "Category Sales",
             data: data.map((item) => item["sold"]),
             borderWidth: 1,
+            backgroundColor: "rgba(153, 102, 255, 0.2)",
+            borderColor: "rgba(153, 102, 255, 1)",
           },
         ],
       };
-      // console.log(dataSet);
       setDataset(dataSet);
     };
     populateData();
-  }, [, data]);
+  }, [data]); // Removed the leading comma
 
   return <>{dataset && <Bar data={dataset} />}</>;
 };

@@ -7,12 +7,11 @@ import { useRef } from "react";
 const Dashboard = () => {
   const soldData = useRef(randomSold());
   const soldData2 = useRef(randomSold());
-  // console.log(soldData);
   return (
-    <>
+    <div className="container mx-auto p-4">
       <Dashboard1 soldData={soldData} />
       <Dashboard2 soldData={soldData} soldData2={soldData2} />
-    </>
+    </div>
   );
 };
 

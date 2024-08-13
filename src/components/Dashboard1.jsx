@@ -1,5 +1,5 @@
 import React from "react";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -19,12 +19,9 @@ const Dashboard1 = (props) => {
     { field: "sold" },
   ]);
   const { soldData } = props;
-  // console.log(soldData);
   const [categoryData, setCategoryData] = useState(null);
 
   useEffect(() => {
-    // console.log("Dashboard1 mounted");
-
     const fetchData = async () => {
       let i = 0;
       const fetchedData = await fetch("https://dummyjson.com/products");
@@ -33,41 +30,40 @@ const Dashboard1 = (props) => {
       const columnData = ["title", "category", "price", "rating", "stock"];
 
       const newData = results["products"].map((item) => {
-        // console.log(item);
         let newItems = {};
-        for (let keys in item) {
-          if (columnData.includes(keys)) {
-            // console.log(keys);
-            newItems[keys] = item[keys];
-            newItems["sold"] = soldData.current[i];
-            i++;
+        for (let key of columnData) {
+          if (key in item) {
+            newItems[key] = item[key];
           }
         }
-
+        newItems["sold"] = soldData.current[i];
+        i++;
         return newItems;
       });
       setRowData(newData);
       setData(newData);
-      // console.log(newData);
     };
 
     fetchData();
-  }, []);
+  }, [soldData]);
 
   useEffect(() => {
-    setCategoryData(groupedData(data, "category"));
-  }, [data, setData]);
+    if (data) {
+      setCategoryData(groupedData(data, "category"));
+    }
+  }, [data]);
+
   return (
-    <>
-      <div>Dashboard 1</div>
-      <div>Results for Dashboard 1</div>
+    <div className="bg-white shadow-md rounded p-4 mb-4">
+      <h2 className="text-xl font-semibold mb-4">Dashboard 1</h2>
+      <div className="mb-4">Results for Dashboard 1</div>
 
       {categoryData && <ChartComponent data={categoryData} />}
 
       <div className="ag-theme-quartz" style={{ height: 500 }}>
         <AgGridReact rowData={rowData} columnDefs={colData} />
       </div>
-    </>
+    </div>
   );
 };
 

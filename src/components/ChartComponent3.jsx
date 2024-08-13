@@ -15,33 +15,34 @@ Chart.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 const ChartComponent3 = (props) => {
   const { data1, data2 } = props;
-  // console.log("I am inside char3");
-  console.log(data1);
-  console.log("Seperate Data1 and Data2");
-  console.log(data2);
+
   const [dataset, setDataset] = useState(null);
+
   useEffect(() => {
     const populateData = () => {
       const dataSet = {
         labels: data1.map((item) => item["title"]),
         datasets: [
           {
-            label: "Product Mapping",
+            label: "Product Mapping 1",
             data: data1.map((item) => item["sold"]),
             borderWidth: 1,
+            backgroundColor: "rgba(75, 192, 192, 0.2)",
+            borderColor: "rgba(75, 192, 192, 1)",
           },
           {
-            label: "Product Mapping",
-            data: data2.map((item) => item["sold"]),
+            label: "Product Mapping 2",
+            data: data2.map((item) => item["sold2"]),
             borderWidth: 1,
+            backgroundColor: "rgba(255, 99, 132, 0.2)",
+            borderColor: "rgba(255, 99, 132, 1)",
           },
         ],
       };
-      // console.log(dataSet);
       setDataset(dataSet);
     };
     populateData();
-  }, [, data1, data2]);
+  }, [data1, data2]);
 
   return <>{dataset && <Bar data={dataset} />}</>;
 };
