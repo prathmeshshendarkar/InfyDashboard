@@ -5,6 +5,8 @@ import Dashboard2 from "./components/Dashboard2";
 import { randomSold } from "./components/randomSold.js";
 import { useRef } from "react";
 
+// I am checking how to pull from origin in replit, just adding one comment to pull the repo instead of pushing.
+
 const App = () => {
   const soldData = useRef(randomSold());
   const soldData2 = useRef(randomSold());
