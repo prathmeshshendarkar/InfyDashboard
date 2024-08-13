@@ -1,5 +1,4 @@
-import React from "react";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Chart,
   CategoryScale,
@@ -13,9 +12,7 @@ import { Bar } from "react-chartjs-2";
 
 Chart.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-const ChartComponent3 = (props) => {
-  const { data1, data2 } = props;
-
+const ChartComponent3 = ({ data1, data2 }) => {
   const [dataset, setDataset] = useState(null);
 
   useEffect(() => {
@@ -42,7 +39,7 @@ const ChartComponent3 = (props) => {
       setDataset(dataSet);
     };
     populateData();
-  }, [data1, data2]);
+  }, [data1, data2]); // Update chart when either dataset changes
 
   return <>{dataset && <Bar data={dataset} />}</>;
 };
