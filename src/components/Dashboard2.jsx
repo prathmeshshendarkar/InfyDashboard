@@ -5,8 +5,9 @@ import "ag-grid-community/styles/ag-theme-quartz.css";
 import ChartComponent2 from "./ChartComponent2.jsx";
 import ChartComponent3 from "./ChartComponent3.jsx";
 import { groupedData } from "./groupedData.js";
+import { randomSold } from "./randomSold.js";
 
-const Dashboard2 = ({ soldData, soldData2 }) => {
+const Dashboard2 = ({ soldData: soldDataRef, soldData2: soldData2Ref }) => {
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [categoryData, setCategoryData] = useState([]);
@@ -16,27 +17,26 @@ const Dashboard2 = ({ soldData, soldData2 }) => {
   const [date1, setDate1] = useState("");
   const [date2, setDate2] = useState("");
 
-  const fetchData = async () => {
-    try {
-      const response = await fetch("https://dummyjson.com/products");
-      const result = await response.json();
-      const products = result.products.map((item, index) => ({
-        ...item,
-        sold: soldData.current[index] || 0,
-        sold2: soldData2.current[index] || 0,
-      }));
-      setData(products);
-      setFilteredData(products);
-      setCategoryData(groupedData(products, "category"));
-      setCategoryData2(groupedData(products, "category"));
-    } catch (error) {
-      console.error("Failed to fetch data", error);
-    }
-  };
+  const today = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch("https://dummyjson.com/products");
+        const result = await response.json();
+        const products = result.products.map((item) => ({
+          ...item,
+          sold: 0,
+          sold2: 0,
+        }));
+        setData(products);
+      } catch (error) {
+        console.error("Failed to fetch data", error);
+      }
+    };
+
     fetchData();
-  }, [soldData, soldData2]);
+  }, []);
 
   useEffect(() => {
     let filtered = data;
@@ -49,23 +49,22 @@ const Dashboard2 = ({ soldData, soldData2 }) => {
       filtered = filtered.filter((item) => item.title === selectedProduct);
     }
 
-    setFilteredData(filtered);
-  }, [selectedCategory, selectedProduct, data]);
-
-  useEffect(() => {
     if (date1 && date2) {
-      // Simulate date-based filtering by generating new data
-      const updatedData = data.map((item) => ({
+      // Generate different sales data for each date
+      const newSoldData = randomSold();
+      const newSoldData2 = randomSold();
+
+      const updatedData = filtered.map((item, index) => ({
         ...item,
-        sold: Math.floor(Math.random() * 100), // Replace this with actual logic
-        sold2: Math.floor(Math.random() * 100), // Replace this with actual logic
+        sold: newSoldData[index] || 0,
+        sold2: newSoldData2[index] || 0,
       }));
 
       setFilteredData(updatedData);
       setCategoryData(groupedData(updatedData, "category"));
       setCategoryData2(groupedData(updatedData, "category"));
     }
-  }, [date1, date2]);
+  }, [selectedCategory, selectedProduct, data, date1, date2]);
 
   return (
     <>
@@ -80,9 +79,9 @@ const Dashboard2 = ({ soldData, soldData2 }) => {
           className="p-2 border rounded"
         >
           <option value="All">All</option>
-          {categoryData.map((cat, index) => (
-            <option key={index} value={cat.category}>
-              {cat.category}
+          {[...new Set(data.map((item) => item.category))].map((cat, index) => (
+            <option key={index} value={cat}>
+              {cat}
             </option>
           ))}
         </select>
@@ -114,6 +113,7 @@ const Dashboard2 = ({ soldData, soldData2 }) => {
           id="date1"
           value={date1}
           onChange={(e) => setDate1(e.target.value)}
+          max={today}
           className="p-2 border rounded"
         />
 
@@ -125,6 +125,7 @@ const Dashboard2 = ({ soldData, soldData2 }) => {
           id="date2"
           value={date2}
           onChange={(e) => setDate2(e.target.value)}
+          max={today}
           className="p-2 border rounded"
         />
       </div>

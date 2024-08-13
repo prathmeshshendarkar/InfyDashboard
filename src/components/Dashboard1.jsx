@@ -21,8 +21,6 @@ const Dashboard1 = ({ soldData }) => {
           sold: soldData.current[index] || 0,
         }));
         setData(products);
-        setFilteredData(products);
-        setCategoryData(groupedData(products, "category"));
       } catch (error) {
         console.error("Failed to fetch data", error);
       }
@@ -32,13 +30,14 @@ const Dashboard1 = ({ soldData }) => {
   }, [soldData]);
 
   useEffect(() => {
-    if (selectedCategory === "All") {
-      setFilteredData(data);
-    } else {
-      setFilteredData(
-        data.filter((item) => item.category === selectedCategory),
-      );
+    let filtered = data;
+
+    if (selectedCategory !== "All") {
+      filtered = data.filter((item) => item.category === selectedCategory);
     }
+
+    setFilteredData(filtered);
+    setCategoryData(groupedData(filtered, "category"));
   }, [selectedCategory, data]);
 
   const columnDefs = [
@@ -63,9 +62,9 @@ const Dashboard1 = ({ soldData }) => {
           className="p-2 border rounded"
         >
           <option value="All">All</option>
-          {categoryData.map((cat, index) => (
-            <option key={index} value={cat.category}>
-              {cat.category}
+          {[...new Set(data.map((item) => item.category))].map((cat, index) => (
+            <option key={index} value={cat}>
+              {cat}
             </option>
           ))}
         </select>

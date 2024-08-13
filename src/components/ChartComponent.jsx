@@ -16,7 +16,11 @@ const ChartComponent = ({ data }) => {
   const [dataset, setDataset] = useState(null);
 
   useEffect(() => {
+    console.log("Data received in ChartComponent:", data);
+
     const populateData = () => {
+      if (data.length === 0) return; // Handle empty data
+
       const dataSet = {
         labels: data.map((item) => item["category"]),
         datasets: [
@@ -31,10 +35,11 @@ const ChartComponent = ({ data }) => {
       };
       setDataset(dataSet);
     };
+
     populateData();
   }, [data]); // Update chart when data changes
 
-  return <>{dataset && <Bar data={dataset} />}</>;
+  return <>{dataset ? <Bar data={dataset} /> : <p>Loading chart data...</p>}</>;
 };
 
 export default ChartComponent;
